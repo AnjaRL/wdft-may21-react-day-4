@@ -1,58 +1,49 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-class PokemonDetail extends Component {
+function PokemonDetail(props) {
+    const [pokemonDetail, updatepokemonDetail] = useState(null)
 
-    state = {
-        pokemonDetail: null,
-    }
-
-    getData = async () => {
+    const getData = async () => {
         // incrementing the id because pokemon ids start from 1
-        let id = Number(this.props.match.params.pokemonIndex) + 1
+        let id = Number(props.match.params.pokemonIndex) + 1
         let response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
         // we save the pokemon id as well to be checked later in our componentDidUpdate 
         let pokemon = {
-            id: this.props.match.params.pokemonIndex,
+            id: props.match.params.pokemonIndex,
             height : response.data.height,
             weight: response.data.weight,
             image: response.data.sprites.other.dream_world.front_default
         }
-        this.setState({
-            pokemonDetail: pokemon
-        })
+        updatepokemonDetail(pokemon)
     }
+    // Behaves as your componentDidUpdate 
 
-    componentDidMount(){
-        console.log('Detail MOUNTED')
-        this.getData()
-    }
-
-    componentDidUpdate(){
-        let newId = this.props.match.params.pokemonIndex
-        let stateId = this.state.pokemonDetail.id
+    // IMPORTANT:  In hooks it runs this `useEffect` after every render, no matter what. 
+    // So this will behave as your componentDidUpdate.  
+    useEffect(() => {
+        let newId = props.match.params.pokemonIndex
+        let stateId = pokemonDetail ? pokemonDetail.id : null
         // compare the id in the state with the id in the props
         if(newId !== stateId) {
-            this.getData() // setState
+            getData() 
         }
+    })
+
+    console.log('Detail RENDERED')
+    if (!pokemonDetail) {
+        return <p>Loading Details. . . </p>
     }
 
-    render() {
-        console.log('Detail RENDERED')
-        if (!this.state.pokemonDetail) {
-            return <p>Loading Details. . . </p>
-        }
-
-        const {pokemonDetail} = this.state
-
-        return (
-            <div>
-                PokemonDetail page
-                <h4>Height: { pokemonDetail.height}</h4>
-                <img src={pokemonDetail.image} />
-            </div>
-        )
-    }
+    return (
+        <div>
+            PokemonDetail page
+            <h4>Height: { pokemonDetail.height}</h4>
+            <img src={pokemonDetail.image} />
+        </div>
+    )
+    
 }
+
 
 export default PokemonDetail

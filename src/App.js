@@ -19,9 +19,6 @@ function App() {
       <PokemonList />
       <Route path={'/pokemon/:pokemonIndex'}  component={PokemonDetail} />
 
-
-
-
     {/* ----------------------------------------- */}
     {/* We did this before lunch */}
     {/* ----------------------------------------- */}
